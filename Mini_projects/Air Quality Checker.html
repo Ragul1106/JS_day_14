@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-Time Air Quality Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        select, button {
+            padding: 8px 12px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .good { color: green; }
+        .moderate { color: orange; }
+        .unhealthy { color: red; }
+    </style>
+</head>
+<body>
+
+    <h1>🌎 Real-Time Air Quality Checker</h1>
+
+    <select id="citySelect">
+        <option value="Delhi">Delhi</option>
+        <option value="Mumbai">Mumbai</option>
+        <option value="New York">New York</option>
+        <option value="London">London</option>
+    </select>
+
+    <button onclick="fetchAQI()">Check AQI</button>
+
+    <div class="result" id="aqiResult"></div>
+    <div class="result" id="pollutants"></div>
+    <div class="result" id="advice"></div>
+
+    <script>
+    const API_KEY = '043c51d5d245a75d77720a6c99b19452'; 
+
+
+    const cities = {
+    "Delhi": { lat: 28.7041, lon: 77.1025 },
+    "Mumbai": { lat: 19.0760, lon: 72.8777 },
+    "New York": { lat: 40.7128, lon: -74.0060 },
+    "London": { lat: 51.5072, lon: -0.1276 }
+     };
+
+    function fetchAQI() {
+    const city = document.getElementById('citySelect').value;
+    const { lat, lon } = cities[city];
+
+    const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const aqi = data.list[0].main.aqi;
+            const components = data.list[0].components;
+            displayAQI(aqi, components);
+        })
+        .catch(error => {
+            console.error('Error fetching AQI:', error);
+            document.getElementById('aqiResult').innerText = "Error fetching data.";
+        });
+}
+
+     function displayAQI(aqi, components) {
+     let aqiText = '';
+     let adviceText = '';
+     let colorClass = '';
+
+    if (aqi === 1) {
+        aqiText = 'Good';
+        adviceText = 'Air quality is good. Enjoy your outdoor activities!';
+        colorClass = 'good';
+    } else if (aqi === 2) {
+        aqiText = 'Fair';
+        adviceText = 'Air quality is fair. Still okay for most people.';
+        colorClass = 'moderate';
+    } else if (aqi === 3) {
+        aqiText = 'Moderate';
+        adviceText = 'Air quality is moderate. Sensitive groups should be cautious.';
+        colorClass = 'moderate';
+    } else if (aqi === 4) {
+        aqiText = 'Poor';
+        adviceText = 'Air quality is poor. Limit outdoor activities.';
+        colorClass = 'unhealthy';
+    } else if (aqi === 5) {
+        aqiText = 'Very Poor';
+        adviceText = 'Air quality is very poor. Avoid outdoor activities.';
+        colorClass = 'unhealthy';
+    }
+
+    document.getElementById('aqiResult').innerHTML = `AQI Level: <span class="${colorClass}">${aqiText}</span>`;
+
+    document.getElementById('pollutants').innerHTML = `
+        <h3>Pollutant Levels (μg/m³):</h3>
+        PM2.5: ${components.pm2_5} <br>
+        PM10: ${components.pm10} <br>
+        CO: ${components.co} <br>
+        NO2: ${components.no2}
+    `;
+
+    document.getElementById('advice').innerHTML = `<strong>Health Advice:</strong> ${adviceText}`;
+}
+
+    </script>
+
+</body>
+</html>

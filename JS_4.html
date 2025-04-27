@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="text" id="city" placeholder="Enter city" />
+    <button onclick="getWeather()">Get Weather</button>
+    <p id="weatherResult"></p>
+
+    <script>
+      const apiKey = "043c51d5d245a75d77720a6c99b19452";
+      async function getWeather() {
+        const city = document.getElementById("city").value;
+        try {
+          const response = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+          );
+          const data = await response.json();
+          if (response.status !== 200) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          document.getElementById(
+            "weatherResult"
+          ).textContent = `Temperature in ${city}: ${data.main.temp}°C`;
+        } catch (error) {
+          console.error("Error fetching weather data:", error);
+          document.getElementById("weatherResult").textContent =
+            "City not found";
+        }
+      }
+    </script>
+  </body>
+</html>

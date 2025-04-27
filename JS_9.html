@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="rate"></div>
+
+    <script>
+      async function getExchangeRate() {
+        try {
+          const response = await fetch(
+            "https://api.exchangerate-api.com/v4/latest/USD"
+          );
+          const data = await response.json();
+          document.getElementById("rate").textContent =
+            "1 USD = " + data.rates.INR + " INR";
+        } catch (error) {
+          console.error("Error fetching exchange rate:", error);
+          document.getElementById("rate").textContent =
+            "Failed to load exchange rate.";
+        }
+      }
+
+      getExchangeRate();
+    </script>
+  </body>
+</html>
